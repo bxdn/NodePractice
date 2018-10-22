@@ -8,7 +8,8 @@ const {
     newGenre,
     validateGenre
 } = require('../models/genre.js');
-const auth = require('../middleware/auth.js')
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 
 router.get('/',async (req,res)=>{
     res.send(await getGenres());
@@ -34,7 +35,7 @@ router.post('/', auth, async (req,res)=>{
     res.send(await getGenres());
 });
 
-router.put('/:name',async (req,res)=>{
+router.put('/:name',[auth,admin],async (req,res)=>{
     const { error } = validateGenre(req.body);
     if( error ){
         return res.status(400).send(error.details[0].message);
@@ -46,7 +47,7 @@ router.put('/:name',async (req,res)=>{
     res.send(genre);
 });
 
-router.delete('/:name',async (req,res)=>{
+router.delete('/:name',[auth,admin],async (req,res)=>{
     const genre = await removeGenreByName(req.params.name);
     if (!genre){
         return res.status(404).send("Genre does not exist!");

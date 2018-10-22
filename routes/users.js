@@ -4,12 +4,13 @@ const mongoose = require('mongoose');
 const {validateUser, User} = require('../models/user.js');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
+const auth = require('../middleware/auth');
 
 router.get('/',async (req,res)=>{
     res.send(await User.find());
 });
-router.get('/:id',async (req,res)=>{
-    const user = await User.findById(req.params.id);
+router.get('/me',auth,async (req,res)=>{
+    const user = await User.findById(req.user._id).select('-passwordHash');
     if (!user){
         return res.status(404).send("Customer does not exist!");
     }
